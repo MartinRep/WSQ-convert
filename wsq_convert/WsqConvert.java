@@ -19,7 +19,7 @@ import org.jnbis.WSQDecoder;
 
 class WsqConvert {
 
-	private static BufferedImage convert(Bitmap bitmap) {
+	public static BufferedImage convert(Bitmap bitmap) {
 		int width = bitmap.getWidth();
 		int height = bitmap.getHeight();
 		byte[] data = bitmap.getPixels();
@@ -30,7 +30,7 @@ class WsqConvert {
 	}
 	
 	
-	public BufferedImage readImage(String fileName) throws FileNotFoundException, IOException {
+	public static BufferedImage readImage(String fileName) throws FileNotFoundException, IOException {
 		File file = new File(fileName);
 		Bitmap bitmap = WSQDecoder.decode(new FileInputStream(file));
 		BufferedImage image = convert(bitmap);
@@ -53,7 +53,7 @@ class WsqConvert {
         }
 	}
 	
-	public List<BufferedImage> readImages(final File folder) throws FileNotFoundException, IOException{
+	public static List<BufferedImage> readImages(final File folder) throws FileNotFoundException, IOException{
 		List<String> fileNamesList = new ArrayList<String>();
 		List<BufferedImage> images = new ArrayList<BufferedImage>();
 		traverseDirectory(".*\\.wsq", folder, fileNamesList);
@@ -64,7 +64,7 @@ class WsqConvert {
 	}
 	
 	
-	public List<String> convertImages(final File folder) throws IOException{
+	public static List<String> convertImages(final File folder) throws IOException{
 		List<String> fileNamesList = new ArrayList<String>();
 		traverseDirectory(".*\\.wsq", folder, fileNamesList);
 		for (String fileName : fileNamesList) {
