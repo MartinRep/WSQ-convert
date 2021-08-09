@@ -17,70 +17,81 @@ public class GUIrunner extends JPanel {
 	JButton convertButton;
 	WsqConvert wsqConvert;
 	File folderSelected;
-	JLabel terminalOutput;
+	JLabel descLabel;
+	JLabel infoLabel;
 
 	public GUIrunner() {
 		setLayout(new GridBagLayout());
 		GridBagConstraints constraints = new GridBagConstraints();
+		
+		descLabel = new JLabel();
+		descLabel.setForeground(Color.BLACK);
+		descLabel.setFont(new Font("Verdana", Font.PLAIN, 12));
+		labelPrintf("<b>1.</b> Vyber adresár s WSQ súbormi.", descLabel, true);
+		labelPrintf("<b>2.</b> Program vypíše koľko súborov bude spracovaných.", descLabel, false);
+		labelPrintf("<b>3.</b> Stlač CONVERT", descLabel, false);
+		labelPrintf("<b>4.</b> Ku každému WSQ súboru sa vytvorý PNG súbor", descLabel, false);
+		labelPrintf("<br/>Poznámka:", descLabel, false);
+		labelPrintf("Z vybraného adresára sa spracujú súbory aj z podadresárov<br/>", descLabel, false);
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.gridwidth = 2;
 		constraints.insets = new Insets(5, 5, 5, 5);
-		constraints.anchor = GridBagConstraints.WEST;
-		folderButton = new JButton("Choose folder with WSQ files");
+		constraints.anchor = GridBagConstraints.NORTH;
+		add(descLabel, constraints);
+		
+		folderButton = new JButton("Vyber adresar s WSQ súbormi...");
 		folderButton.addActionListener((ActionEvent e) -> {
 			chooser = new JFileChooser();
 			chooser.setCurrentDirectory(new java.io.File("."));
-			chooser.setDialogTitle("Choose WSQ files folder");
+			chooser.setDialogTitle("Vyber adresar s WSQ súbormi...");
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooser.setAcceptAllFileFilterUsed(false);
 			if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 				folderSelected = chooser.getSelectedFile();
 				ArrayList<String> wsqFiles = new ArrayList<String>();
 				WsqConvert.traverseDirectory(".*\\.wsq", chooser.getSelectedFile(), wsqFiles);
-				printToTerminal(String.format("Number of files counted: %d", wsqFiles.size()));
+				labelPrintf(String.format("Počet vybraných súborov: %d", wsqFiles.size()), infoLabel, true);
 				convertButton.setVisible(true);
-			} else {
-				System.out.println("No Selection ");
 			}
-
 		});
+		constraints.gridx = 0;
+		constraints.gridy = 1;
 		add(folderButton, constraints);
-
-		convertButton = new JButton("CONVERT to PNG");
+		
+		infoLabel = new JLabel();
+		infoLabel.setForeground(Color.BLACK);
+		infoLabel.setFont(new Font("Verdana", Font.BOLD, 15) );
+		constraints.gridx = 0;
+		constraints.gridy = 2;
+		add(infoLabel, constraints);
+		
+		convertButton = new JButton("Konvertovať");
 		convertButton.setVisible(false);
 		convertButton.addActionListener((ActionEvent e) -> {
 			try {
-				convertButton.setText("Processing....");
 				ArrayList<String> filesProcessed = (ArrayList<String>) WsqConvert.convertImages(folderSelected);
-				printToTerminal(String.format("Files processed: %d", filesProcessed.size()));
+				labelPrintf(String.format("Spracovaných súborov: %d", filesProcessed.size()), infoLabel, false);
 				convertButton.setVisible(false);
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				infoLabel.setForeground(Color.RED);
+				infoLabel.setFont(new Font("Verdana", Font.BOLD, 8));
+				infoLabel.setText(e1.getMessage());
 			}
 		});
-		constraints.gridy = 2;
-		add(convertButton, constraints);
-		
-		terminalOutput = new JLabel();
-		terminalOutput.setForeground(Color.BLACK);
-		printToTerminal("Choose a folder containing WSQ files.");
-		printToTerminal("Please note:");
-		printToTerminal("All files in sub-directories will be included");
 		constraints.gridx = 0;
-		constraints.gridy = 1;
-		add(terminalOutput, constraints);
-	
+		constraints.gridy = 3;
+		add(convertButton, constraints);
 
 	}
 	
-	private void printToTerminal(String message) {
-		String previousText = terminalOutput.getText();
-		if(previousText.compareTo("") == 0) {
-			terminalOutput.setText(String.format("<html><i>%s</i><html>", message));
+	private void labelPrintf(String message, JLabel label, boolean newLine) {
+		String previousText = label.getText();
+		if(newLine == true) {
+			label.setText(String.format("<html><i>%s</i><html>", message));
 		} else {
 			previousText = previousText.substring(0, previousText.lastIndexOf("</i>"));
-			terminalOutput.setText(String.format("%s<br>%s</i><html>", previousText, message));
+			label.setText(String.format("%s<br>%s</i><html>", previousText, message));
 		}
 	}
 
@@ -93,7 +104,7 @@ public class GUIrunner extends JPanel {
 			}
 		});
 		frame.getContentPane().add(panel, "North");
-		frame.setSize(new Dimension(300, 300));
+		frame.setSize(new Dimension(400, 400));
 		frame.setVisible(true);
 	}
 }

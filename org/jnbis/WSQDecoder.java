@@ -199,6 +199,7 @@ public class WSQDecoder implements WSQConstants, NISTConstants {
 				result.put(key, value);
 
 			}
+			in.close();
 			return result;
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
